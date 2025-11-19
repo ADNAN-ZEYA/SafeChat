@@ -1,0 +1,51 @@
+# ============================================
+# ✔ SAFECHAT-MINI PROJECT IGNORE FILE
+# Backend (Python) + Frontend (React + Vite)
+# ============================================
+
+# ------------- BACKEND (backend-ml) -------------
+backend-ml/venv/
+backend-ml/__pycache__/
+backend-ml/*.pyc
+backend-ml/*.pyo
+backend-ml/*.pyd
+
+# Backend environment files
+backend-ml/.env
+backend-ml/*.env
+
+# ML related
+backend-ml/models/
+backend-ml/uploads/
+backend-ml/data/
+
+# Logs / JSON message storage
+backend-ml/comments.json
+backend-ml/messages.json
+
+# ------------- FRONTEND (safechat-react) -------------
+safechat-react/node_modules/
+safechat-react/dist/
+
+# Frontend environment variables
+safechat-react/.env
+safechat-react/*.env
+
+# ------------- GENERAL -------------
+# OS system files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE folders
+.vscode/
+.idea/
+
+# Temp files
+*.tmp
+*.cache

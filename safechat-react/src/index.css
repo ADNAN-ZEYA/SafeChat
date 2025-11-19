@@ -1,0 +1,21 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* NEW: Sleek Dark Theme (Inspired by Image 1) */
+body {
+  background-color: #121212; /* Very dark background */
+  color: #e0e0e0; /* Off-white text */
+  font-family: 'Inter', sans-serif; /* Modern font, if you have it imported */
+}
+
+/* Custom scrollbar for the dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  background-color: #2a2a2a; /* Dark scrollbar track */
+}
+::-webkit-scrollbar-thumb {
+  background-color: #1DB954; /* Vibrant green scrollbar handle */
+  border-radius: 10px;
+}
