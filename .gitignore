@@ -49,3 +49,22 @@ yarn-error.log*
 # Temp files
 *.tmp
 *.cache
+ECHO is on.
+"# -- auto-appended safe ignores --" 
+"backend-ml/venv/" 
+"backend-ml/models/" 
+"backend-ml/data/" 
+"backend-ml/uploads/" 
+"backend-ml/comments.json" 
+"backend-ml/messages.json" 
+"backend-ml/.env" 
+"safechat-react/node_modules/" 
+
+# -- auto-appended safe ignores --
+backend-ml/venv/
+backend-ml/models/
+backend-ml/data/
+backend-ml/uploads/
+backend-ml/comments.json
+backend-ml/.env
+safechat-react/node_modules/
