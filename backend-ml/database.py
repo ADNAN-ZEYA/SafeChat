@@ -8,7 +8,7 @@ def get_db_connection():
         connection = mysql.connector.connect(
             host='localhost',
             user='root',  # Or your MySQL username if it's different
-            password='Zishan786@', # <-- IMPORTANT: REPLACE THIS
+            password=' ', # <-- IMPORTANT: REPLACE THIS
             database='safechat_db'
         )
         if connection.is_connected():
