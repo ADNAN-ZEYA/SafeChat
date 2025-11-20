@@ -40,29 +40,6 @@ Scikit-learn (Machine Learning)
 
 Uvicorn (ASGI Server)
 
-# Project Structure
-SAFECHAT-MINI/
-│
-├── backend-ml/ # Python backend (FastAPI/Flask + ML)
-│ ├── app.py # Main API server
-│ ├── train_model.py # Model training script
-│ ├── evaluate.py # Evaluation script
-│ ├── database.py # Message storage helper
-│ ├── metrics.py # Evaluation metrics
-│ ├── messages.json # Stored messages (sample)
-│ ├── comments.json # Sample dataset
-│ ├── data/ # Training/testing datasets
-│ ├── models/ # Saved ML models
-│ ├── uploads/ # Uploaded test files
-│ └── venv/ # Python environment (ignored)
-│
-├── safechat-react/ # React frontend
-│ ├── src/
-│ ├── public/
-│ └── package.json
-│
-├── .gitignore
-└── README.md 
 
 
 ---
