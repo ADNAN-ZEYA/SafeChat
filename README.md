@@ -1,4 +1,4 @@
-SafeChat: AI-Powered Toxic Content Moderation Platform
+#SafeChat: AI-Powered Toxic Content Moderation Platform
 
 SafeChat is a full-stack social media application designed to foster a safer online community. It uses a Machine Learning model to detect and moderate toxic content in real-time across posts, comments, and private chats.
 
