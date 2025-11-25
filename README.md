@@ -109,24 +109,22 @@ Below are screenshots from the project (images are stored in `backend-ml/uploads
 
 - **Login page** (first image)
 
-  ![Login Page](backend-ml/uploads/Akhil_WhatsApp Image 2025-10-01 at 16.13.36_3de809d1.jpg)
+  ![Login Page](docs/screenshots/login.jpg)
 
 - **Test results / metrics** (second image)
 
-  ![Test Results](backend-ml/uploads/Babul12_WhatsApp Image 2025-10-01 at 16.13.36_9e51de77.jpg)
+  ![Test Results](docs/screenshots/metrics.jpg)
 
 - **Home view — feed / pending moderation** (third image)
 
-  ![Home View 1](backend-ml/uploads/Zishan_WhatsApp Image 2025-08-14 at 13.43.35_0837103b.jpg)
+  ![Home View 1](docs/screenshots/home1.jpg)
 
 - **Home view — moderation banners / post pending** (fourth image)
 
-  ![Home View 2](backend-ml/uploads/Zishan_WhatsApp Image 2025-10-01 at 16.13.36_3de809d1.jpg)
+  ![Home View 2](docs/screenshots/home2.jpg)
 
 - **Chat view** (fifth image)
 
-  ![Chat View](backend-ml/uploads/Akhil_WhatsApp Image 2025-10-01 at 16.13.36_3de809d1.jpg)
-
-If you want a different ordering or to include additional attachments, add the image files to `backend-ml/uploads/` (or `docs/screenshots/`) and tell me which filenames to use — I will update the README accordingly.
+  ![Chat View](docs/screenshots/chat.jpg)
 
 
