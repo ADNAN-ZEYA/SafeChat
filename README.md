@@ -113,18 +113,18 @@ Below are screenshots from the project (images are stored in `backend-ml/uploads
 
 - **Test results / metrics** (second image)
 
-  ![Test Results](docs/screenshots/metrics.jpg)
+  ![Test Results](docs/screenshots/metrics.png)
 
 - **Home view — feed / pending moderation** (third image)
 
-  ![Home View 1](docs/screenshots/home1.jpg)
+  ![Home View 1](docs/screenshots/home1.png)
 
 - **Home view — moderation banners / post pending** (fourth image)
 
-  ![Home View 2](docs/screenshots/home2.jpg)
+  ![Home View 2](docs/screenshots/home2.png)
 
 - **Chat view** (fifth image)
 
-  ![Chat View](docs/screenshots/chat.jpg)
+  ![Chat View](docs/screenshots/chat.png)
 
 
