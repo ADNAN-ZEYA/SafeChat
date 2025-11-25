@@ -1,4 +1,4 @@
-**SafeChat — AI-Powered Real-time Cyberbullying Detection System**
+# SafeChat — AI-Powered Real-time Cyberbullying Detection System
 
 SafeChat is a full-stack demo that showcases a small social/chat app protected by an ML-based toxicity detector. The backend (FastAPI + scikit-learn) classifies text and enforces moderation rules (block toxic private messages, mark posts/comments for review). The frontend is a React + Vite UI demonstrating the user flows.
 
