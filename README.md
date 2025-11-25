@@ -101,25 +101,24 @@ python train_model.py
 
 **Contributing**
 - Fixes and improvements welcome. Please open issues for bugs or feature requests.
-- Fixes and improvements welcome. Please open issues for bugs or feature requests.
 
 **Screenshots**
 
-Below are screenshots from the project (images are stored in `backend-ml/uploads/`).
+Below are screenshots from the project.
 
-- **Login page** (first image)
+- **Login page**
 
   ![Login Page](docs/screenshots/login.jpg)
 
-- **Test results / metrics** (second image)
+- **Test results / metrics**
 
   ![Test Results](docs/screenshots/metrics.png)
 
-- **Home view — feed / pending moderation** (third image)
+- **Home view — feed / pending moderation**
 
   ![Home View 1](docs/screenshots/home1.png)
 
-- **Home view — moderation banners / post pending** (fourth image)
+- **Home view — moderation banners / post pending**
 
   ![Home View 2](docs/screenshots/home2.png)
 
