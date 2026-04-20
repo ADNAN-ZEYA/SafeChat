@@ -737,7 +737,6 @@ def list_pending_message_reports():
             JOIN users reporter ON reporter.id = r.reporter_id
             JOIN users reported ON reported.id = r.reported_user_id
             LEFT JOIN chat_messages m ON m.id = r.message_id
-            WHERE r.status = 'pending'
             ORDER BY r.created_at DESC
             """
         )
@@ -758,12 +757,8 @@ def _update_message_report_status(report_id: int, status: str, reviewed_by_usern
     reviewed_by_id = None
     if reviewed_by_username:
         reviewed_by_id = get_user_id(reviewed_by_username, db)
-        if not reviewed_by_id:
-            try:
-                db.close()
-            except Exception:
-                pass
-            raise HTTPException(status_code=404, detail="Reviewer not found")
+        # If reviewer not found in DB (e.g. hardcoded admin), proceed with NULL
+        # This allows non-DB admin users to still resolve/dismiss reports
 
     cursor = None
     try:
@@ -806,6 +801,61 @@ def resolve_message_report(report_id: int, payload: ReportReviewPayload):
 def dismiss_message_report(report_id: int, payload: ReportReviewPayload):
     return _update_message_report_status(report_id, "dismissed", payload.reviewed_by_username)
 
+
+# --- Presence / Heartbeat Endpoints ---
+class HeartbeatPayload(BaseModel):
+    username: str
+
+@app.post("/heartbeat")
+def heartbeat(payload: HeartbeatPayload):
+    """Called every ~10s by the frontend to indicate the user is online."""
+    db = get_db_connection()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database connection failed")
+    user_id = get_user_id(payload.username, db)
+    if not user_id:
+        try: db.close()
+        except: pass
+        raise HTTPException(status_code=404, detail="User not found")
+    cursor = None
+    try:
+        cursor = db.cursor()
+        cursor.execute(
+            """INSERT INTO user_presence (user_id, last_seen) VALUES (%s, CURRENT_TIMESTAMP)
+            ON CONFLICT (user_id) DO UPDATE SET last_seen = CURRENT_TIMESTAMP""",
+            (user_id,)
+        )
+        db.commit()
+    except DatabaseError as e:
+        try: db.rollback()
+        except: pass
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        safe_close_cursor(cursor)
+        try: db.close()
+        except: pass
+    return {"status": "ok"}
+
+@app.get("/online_users")
+def get_online_users():
+    """Returns list of usernames who sent a heartbeat in the last 15 seconds."""
+    db = get_db_connection()
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database connection failed")
+    cursor = None
+    try:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute(
+            """SELECT u.username FROM user_presence p
+            JOIN users u ON u.id = p.user_id
+            WHERE p.last_seen > CURRENT_TIMESTAMP - INTERVAL '15 seconds'"""
+        )
+        rows = cursor.fetchall()
+        return [r["username"] for r in rows]
+    finally:
+        safe_close_cursor(cursor)
+        try: db.close()
+        except: pass
 
 # --- Create Database Tables (idempotent) ---
 def create_tables():
@@ -888,6 +938,13 @@ def create_tables():
                 UNIQUE (sender_id, receiver_id),
                 FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
                 FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS user_presence (
+                user_id INT PRIMARY KEY,
+                last_seen TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
         """)
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_message_reports_reporter ON message_reports(reporter_id)")

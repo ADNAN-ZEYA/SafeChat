@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Sidebar from './Sidebar';
 import { MagnifyingGlassIcon, UserGroupIcon, ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
+import usePresence from './hooks/usePresence';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 const api = {
@@ -43,6 +44,9 @@ export default function FindFriendsPage({ user, onLogout, onNavigateToHome, onNa
   const [users, setUsers] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(true);
+
+  // --- Phase A: Presence ---
+  const { onlineUsers } = usePresence(user);
 
   useEffect(() => {
     (async () => {
@@ -98,11 +102,12 @@ export default function FindFriendsPage({ user, onLogout, onNavigateToHome, onNa
                     <div className="relative">
                       <img src={`https://i.pravatar.cc/150?u=${item.username}`} alt={item.username}
                         className="h-12 w-12 rounded-full border border-sc-outline/25 transition-transform duration-200 group-hover:scale-105" />
-                      <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-sc-container bg-sc-primary" />
+                      <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-sc-container ${onlineUsers.has(item.username) ? 'bg-green-500' : 'bg-sc-text-muted/40'}`}
+                        style={onlineUsers.has(item.username) ? { boxShadow: '0 0 6px rgba(34,197,94,0.4)' } : {}} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold capitalize text-sc-text">{item.username}</p>
-                      <p className="text-xs text-sc-text-muted">Registered user</p>
+                      <p className={`text-xs ${onlineUsers.has(item.username) ? 'text-green-600' : 'text-sc-text-muted'}`}>{onlineUsers.has(item.username) ? 'Online' : 'Offline'}</p>
                     </div>
                     <button onClick={() => onStartChat(item.username)}
                       className="shrink-0 rounded-full bg-sc-secondary px-5 py-2 text-xs font-semibold text-sc-on-secondary hover-scale border border-sc-on-secondary/15 transition-all">

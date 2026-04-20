@@ -54,20 +54,8 @@ export default function Sidebar({
         })}
       </nav>
 
-      {/* Bottom */}
-      <div className="mt-auto px-4 pb-6 space-y-4">
-        <div className="h-px w-full bg-sc-outline/20" />
-        <div className="flex flex-col gap-1 px-1">
-          <button className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm text-sc-text-muted hover:bg-sc-container-high/60 transition-all duration-200">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>
-            Help
-          </button>
-          <button className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm text-sc-text-muted hover:bg-sc-container-high/60 transition-all duration-200">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0l-3-3m3 3l3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
-            Archive
-          </button>
-        </div>
-      </div>
+      {/* Spacer to push nav up and leave room for parent's logout button */}
+      <div className="mt-auto pb-20" />
     </div>
   );
 }
