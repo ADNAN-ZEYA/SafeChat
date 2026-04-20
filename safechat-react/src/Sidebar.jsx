@@ -2,90 +2,72 @@
 import { BellIcon, ChatBubbleOvalLeftEllipsisIcon, HomeIcon, UserIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 
-/* ────────────────────────────────────────────────────────────
-   Sidebar ── polished nav rail
-   Props: onShowNotifications, onShowChat, onNavigateToHome,
-          onNavigateToProfile, onNavigateToFriends
-   ──────────────────────────────────────────────────────────── */
-
-const NAV_ROUTES = ['Home', 'Profile', 'Find Friends'];
-
 export default function Sidebar({
-  onShowNotifications,
-  onShowChat,
-  onNavigateToHome,
-  onNavigateToProfile,
-  onNavigateToFriends,
-  activePage = 'Home',        // optional: highlight the current page
+  onShowNotifications, onShowChat, onNavigateToHome, onNavigateToProfile, onNavigateToFriends, activePage = 'Home',
 }) {
   const [active, setActive] = useState(activePage);
-
-  const handleNav = (item, onClick) => {
-    setActive(item);
-    onClick?.();
-  };
+  const handleNav = (item, onClick) => { setActive(item); onClick?.(); };
 
   const navItems = [
-    { name: 'Home',             icon: HomeIcon,                  onClick: onNavigateToHome },
-    { name: 'Notifications',    icon: BellIcon,                  onClick: onShowNotifications },
-    { name: 'Messages',         icon: ChatBubbleOvalLeftEllipsisIcon, onClick: onShowChat },
-    { name: 'Find Friends',     icon: MagnifyingGlassIcon,       onClick: onNavigateToFriends },
-    { name: 'Profile',          icon: UserIcon,                  onClick: onNavigateToProfile },
+    { name: 'Home', icon: HomeIcon, onClick: onNavigateToHome },
+    { name: 'Notifications', icon: BellIcon, onClick: onShowNotifications },
+    { name: 'Messages', icon: ChatBubbleOvalLeftEllipsisIcon, onClick: onShowChat },
+    { name: 'Find Friends', icon: MagnifyingGlassIcon, onClick: onNavigateToFriends },
+    { name: 'Profile', icon: UserIcon, onClick: onNavigateToProfile },
   ];
 
   return (
-    <div className="relative flex h-full w-full flex-col gap-8 bg-black/60 backdrop-blur-md">
-      {/* ── Brand ── */}
-      <div className="px-4 pt-6">
-        <h1 className="bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-3xl font-extrabold tracking-tight text-transparent drop-shadow-[0_0_8px_rgba(34,197,94,.45)]">
-          SafeChat
-        </h1>
-        <div className="mt-2 h-px w-20 rounded-full bg-gradient-to-r from-green-500/60 to-transparent" />
+    <div className="relative flex h-full w-full flex-col gap-8 bg-sc-container-low border-r border-sc-outline/25">
+      {/* Brand */}
+      <div className="px-5 pt-7">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-gradient-primary">SafeChat</h1>
+        <div className="mt-3 h-0.5 w-16 rounded-full bg-gradient-to-r from-sc-primary/40 to-transparent" />
       </div>
 
-      {/* ── Nav ── */}
+      {/* New Chat CTA */}
+      <div className="px-4">
+        <button onClick={onShowChat}
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-primary px-5 py-3 text-sm font-bold text-sc-on-primary hover-scale border border-sc-primary/20 shadow-ambient transition-all duration-200">
+          <span className="text-lg leading-none">+</span> New Chat
+        </button>
+      </div>
+
+      {/* Nav */}
       <nav className="flex flex-col gap-1 px-3" role="navigation">
         {navItems.map((item) => {
           const isActive = active === item.name;
-          const isMain = NAV_ROUTES.includes(item.name);
           return (
-            <button
-              key={item.name}
-              onClick={() => handleNav(item.name, item.onClick)}
+            <button key={item.name} onClick={() => handleNav(item.name, item.onClick)}
               className={[
-                'group flex items-center gap-4 rounded-xl px-4 py-3 text-[15px] font-medium transition-all duration-200',
+                'group flex items-center gap-4 rounded-2xl px-4 py-3 text-[15px] font-medium transition-all duration-200',
                 isActive
-                  ? 'bg-green-500/10 text-green-400 shadow-[inset_2px_0_0_0_rgba(34,197,94,.7)]'
-                  : 'text-gray-400 hover:bg-white/[.06] hover:text-green-300',
-                'before:absolute before:inset-0 before:rounded-xl before:bg-white/[.02] before:opacity-0 before:transition-opacity before:duration-200 before:group-hover:before:opacity-100',
+                  ? 'bg-sc-secondary/40 text-sc-primary border border-sc-primary/15 shadow-sm'
+                  : 'text-sc-text-muted hover:bg-sc-container-high/60 hover:text-sc-text border border-transparent',
                 'relative overflow-hidden',
               ].filter(Boolean).join(' ')}
-              title={item.name}
-            >
-              {/* subtle glow behind icon */}
-              <span
-                className={[
-                  'absolute -left-1 h-8 w-8 rounded-full blur transition-all duration-300',
-                  isActive ? 'bg-green-500/20 opacity-100' : 'opacity-0 group-hover:bg-green-400/10',
-                ].join(' ')}
-              />
-              <item.icon
-                className={[
-                  'relative z-10 h-6 w-6 transition-colors duration-200',
-                  isActive ? 'text-green-400' : 'text-gray-500 group-hover:text-green-400',
-                ].join(' ')}
-              />
+              title={item.name}>
+              <item.icon className={['relative z-10 h-5 w-5 transition-colors duration-200', isActive ? 'text-sc-primary' : 'text-sc-text-muted group-hover:text-sc-primary'].join(' ')} />
               <span className="relative z-10">{item.name}</span>
+              {isActive && <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-gradient-primary animate-pulse-glow" />}
             </button>
           );
         })}
       </nav>
 
-      {/* ── Bottom divider ── */}
-      <div className="mt-auto px-4 pb-6">
-        <div className="h-px w-full rounded-full bg-gradient-to-r from-transparent to-green-500/20" />
+      {/* Bottom */}
+      <div className="mt-auto px-4 pb-6 space-y-4">
+        <div className="h-px w-full bg-sc-outline/20" />
+        <div className="flex flex-col gap-1 px-1">
+          <button className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm text-sc-text-muted hover:bg-sc-container-high/60 transition-all duration-200">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>
+            Help
+          </button>
+          <button className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm text-sc-text-muted hover:bg-sc-container-high/60 transition-all duration-200">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0l-3-3m3 3l3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+            Archive
+          </button>
+        </div>
       </div>
     </div>
   );
 }
-
