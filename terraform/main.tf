@@ -8,7 +8,8 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-south-1"
+  region  = "ap-south-1"
+  profile = "personal"
 }
 
 # --- Key Pair ---
@@ -69,7 +70,7 @@ resource "aws_security_group" "safechat_sg" {
 # --- EC2 Instance ---
 resource "aws_instance" "safechat_server" {
   ami                    = "ami-0f58b397bc5c1f2e8"  # Ubuntu 22.04 ap-south-1
-  instance_type          = "t2.micro"
+  instance_type          = "t3.micro"
   key_name               = aws_key_pair.safechat_key.key_name
   vpc_security_group_ids = [aws_security_group.safechat_sg.id]
 
