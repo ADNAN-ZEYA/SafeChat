@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: safechat-frontend
+  labels:
+    app: safechat-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: safechat-frontend
+  template:
+    metadata:
+      labels:
+        app: safechat-frontend
+    spec:
+      containers:
+        - name: safechat-frontend
+          image: zishann555/safechat-frontend:latest
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: safechat-frontend-service
+spec:
+  selector:
+    app: safechat-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
