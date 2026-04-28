@@ -68,8 +68,6 @@ backend-ml/uploads/
 backend-ml/comments.json
 backend-ml/.env
 safechat-react/node_modules/
-backend-ml/models/ 
-backend-ml/*.joblib 
 safechat-react/.env.example
 CLAUDE.md
 # Terraform
