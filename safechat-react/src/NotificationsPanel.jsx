@@ -1,42 +1,32 @@
 // src/NotificationsPanel.jsx
-
-// 1. Receive the 'notifications' list as a prop
 export default function NotificationsPanel({ onClose, notifications }) {
-
-    // 2. Define the colors for our new 'like' type
     const typeClasses = {
-        warning: 'bg-yellow-900/50 text-yellow-300',
-        like: 'bg-pink-900/50 text-pink-300', // Using pink for likes
-        comment: 'bg-blue-900/50 text-blue-300',
+        warning: 'bg-sc-tertiary/30 text-sc-on-tertiary border-b border-sc-tertiary/20',
+        like: 'bg-sc-primary-light/15 text-sc-primary border-b border-sc-primary-light/15',
+        comment: 'bg-sc-secondary/25 text-sc-on-secondary border-b border-sc-secondary/20',
+        message: 'bg-sc-container-high text-sc-text border-b border-sc-outline/15',
     };
 
     return (
-        // Dark overlay
         <div className="fixed inset-0 z-40" onClick={onClose}>
-            {/* Dark panel */}
-            <div
-                className="absolute top-16 right-4 w-80 bg-neutral-800 rounded-lg shadow-xl border border-neutral-700 z-50"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="p-4 border-b border-neutral-700 flex justify-between items-center">
-                    <h3 className="font-bold text-white">Notifications</h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white">&times;</button>
+            <div className="absolute top-16 right-4 w-80 frosted-glass rounded-card elevation-3 z-50 animate-slide-in-right overflow-hidden"
+                onClick={(e) => e.stopPropagation()}>
+                <div className="p-5 flex justify-between items-center border-b border-sc-outline/20">
+                    <h3 className="font-display font-bold text-sc-text text-lg">Notifications</h3>
+                    <button onClick={onClose} className="text-sc-text-muted hover:text-sc-text transition-colors text-xl leading-none hover:scale-110 transition-transform">×</button>
                 </div>
                 <div className="flex flex-col max-h-96 overflow-y-auto">
-                    
-                    {/* 3. Map over the LIVE 'notifications' prop instead of dummy data */}
                     {Array.isArray(notifications) && notifications.length > 0 ? (
-                        notifications.map((note) => (
-                            <div key={note.id} className={`p-4 border-b border-neutral-700 text-sm ${typeClasses[note.type] || 'bg-gray-700'}`}>
+                        notifications.map((note, idx) => (
+                            <div key={note.id} className={`px-5 py-4 text-sm animate-fade-in-up ${typeClasses[note.type] || 'bg-sc-container border-b border-sc-outline/15'}`}
+                                style={{ animationDelay: `${idx * 50}ms` }}>
                                 {note.user ? <strong className="font-semibold capitalize mr-1">{note.user}</strong> : ''}
                                 {note.text}
                             </div>
                         ))
                     ) : (
-                        // Show this message if the list is empty
-                        <p className="p-4 text-center text-gray-500">No new notifications.</p>
+                        <p className="p-5 text-center text-sc-text-muted text-sm">No new notifications.</p>
                     )}
-                    
                 </div>
             </div>
         </div>
