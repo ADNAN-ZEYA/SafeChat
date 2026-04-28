@@ -61,9 +61,53 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu/safechat
+
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+
             docker pull zishann555/safechat-backend:latest
             docker pull zishann555/safechat-frontend:latest
-            docker stop safechat_backend safechat_frontend || true
-            docker rm safechat_backend safechat_frontend || true
+
+            cat > docker-compose.yml << 'EOF'
+            services:
+              backend:
+                image: zishann555/safechat-backend:latest
+                container_name: safechat_backend
+                restart: unless-stopped
+                env_file:
+                  - ./backend-ml/.env
+                environment:
+                  - PYTHONUNBUFFERED=1
+                volumes:
+                  - uploads_data:/app/uploads
+                  - model_data:/app/models
+                ports:
+                  - "8000:8000"
+                networks:
+                  - safechat_net
+                dns:
+                  - 8.8.8.8
+              frontend:
+                image: zishann555/safechat-frontend:latest
+                container_name: safechat_frontend
+                restart: unless-stopped
+                ports:
+                  - "3000:80"
+                networks:
+                  - safechat_net
+                depends_on:
+                  - backend
+            volumes:
+              uploads_data:
+                name: safechat_uploads
+              model_data:
+                name: safechat_models
+            networks:
+              safechat_net:
+                name: safechat_network
+                driver: bridge
+            EOF
+
+            docker compose down || true
             docker compose up -d
             docker image prune -f
+            echo "Deployment complete!"
