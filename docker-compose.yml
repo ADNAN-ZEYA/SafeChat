@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: safechat-backend:latest
+    container_name: safechat_backend
+    restart: unless-stopped
+    env_file:
+      - ./backend-ml/.env
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - uploads_data:/app/uploads
+      - model_data:/app/models
+    ports:
+      - "8000:8000"
+    networks:
+      - safechat_net
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/docs')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_API_BASE_URL: "${VITE_API_BASE_URL:-http://localhost:8000}"
+    image: safechat-frontend:latest
+    container_name: safechat_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    networks:
+      - safechat_net
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  uploads_data:
+    name: safechat_uploads
+  model_data:
+    name: safechat_models
+
+networks:
+  safechat_net:
+    name: safechat_network
+    driver: bridge

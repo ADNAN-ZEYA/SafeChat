@@ -1,0 +1,230 @@
+/* src/index.css — Radiant Editorial Design System */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Body base ── */
+body {
+  background-color: #fcf6ee !important;
+  color: #312e29;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* ── Custom scrollbar — warm theme ── */
+::-webkit-scrollbar {
+  width: 6px;
+  background-color: #f6f0e7;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #d4c8b8;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #b1aca5;
+}
+
+/* ── Utility: Primary gradient (coral → peach) ── */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #a83206 0%, #ff784e 100%) !important;
+}
+
+/* ── Utility: Text gradient (coral) ── */
+.text-gradient-primary {
+  background: linear-gradient(135deg, #a83206 0%, #ff784e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Utility: Frosted glass overlay ── */
+.frosted-glass {
+  background: rgba(252, 246, 238, 0.85) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(177, 172, 165, 0.25);
+}
+
+/* ============================================================
+   BORDERS & ELEVATION SYSTEM
+   ============================================================ */
+
+/* Subtle warm border */
+.border-warm {
+  border: 1px solid rgba(177, 172, 165, 0.3);
+}
+
+/* Medium warm border */
+.border-warm-md {
+  border: 1px solid rgba(177, 172, 165, 0.45);
+}
+
+/* Elevation Level 1 — resting cards */
+.elevation-1 {
+  border: 1px solid rgba(177, 172, 165, 0.25);
+  box-shadow:
+    0 1px 3px rgba(49, 46, 41, 0.06),
+    0 1px 2px rgba(49, 46, 41, 0.04);
+}
+
+/* Elevation Level 2 — raised cards, hovered elements */
+.elevation-2 {
+  border: 1px solid rgba(177, 172, 165, 0.30);
+  box-shadow:
+    0 4px 12px rgba(49, 46, 41, 0.08),
+    0 2px 4px rgba(49, 46, 41, 0.04);
+}
+
+/* Elevation Level 3 — modals, popovers */
+.elevation-3 {
+  border: 1px solid rgba(177, 172, 165, 0.20);
+  box-shadow:
+    0 12px 40px rgba(49, 46, 41, 0.12),
+    0 4px 12px rgba(49, 46, 41, 0.06);
+}
+
+/* Elevation Level 4 — floating overlays */
+.elevation-4 {
+  border: 1px solid rgba(177, 172, 165, 0.15);
+  box-shadow:
+    0 20px 60px rgba(49, 46, 41, 0.14),
+    0 8px 24px rgba(49, 46, 41, 0.08);
+}
+
+/* ============================================================
+   HOVER TRANSITIONS
+   ============================================================ */
+
+/* Hover scale for buttons — lifts with shadow on hover */
+.hover-scale {
+  transition: transform 0.22s cubic-bezier(.4,0,.2,1),
+              box-shadow 0.22s cubic-bezier(.4,0,.2,1),
+              border-color 0.22s ease;
+}
+.hover-scale:hover {
+  transform: translateY(-1px) scale(1.015);
+  box-shadow:
+    0 6px 20px rgba(168, 50, 6, 0.15),
+    0 2px 6px rgba(49, 46, 41, 0.08);
+}
+.hover-scale:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Card hover — lifts from elevation-1 to elevation-2 */
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(.4,0,.2,1),
+              box-shadow 0.25s cubic-bezier(.4,0,.2,1),
+              border-color 0.25s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  border-color: rgba(177, 172, 165, 0.45);
+  box-shadow:
+    0 8px 30px rgba(49, 46, 41, 0.10),
+    0 4px 8px rgba(49, 46, 41, 0.05);
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+/* Fade in up — page sections */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s cubic-bezier(.4,0,.2,1) both;
+}
+
+/* Staggered fade in */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.10s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.20s; }
+
+/* Fade in down — notifications */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-down {
+  animation: fadeInDown 0.35s cubic-bezier(.4,0,.2,1) both;
+}
+
+/* Slide in from right — panels */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-slide-in-right {
+  animation: slideInRight 0.3s cubic-bezier(.4,0,.2,1) both;
+}
+
+/* Scale in — modals */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-scale-in {
+  animation: scaleIn 0.25s cubic-bezier(.4,0,.2,1) both;
+}
+
+/* Pulse glow — active indicators */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(168, 50, 6, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(168, 50, 6, 0); }
+}
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Shimmer — loading placeholder */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #e8e2d8 25%, #f6f0e7 50%, #e8e2d8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Subtle float — decorative */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
