@@ -36,10 +36,40 @@ jobs:
           build-args: |
             VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
 
+  security-scan:
+    name: Security Scan (DevSecOps)
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: Scan backend image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: zishann555/safechat-backend:latest
+          format: table
+          exit-code: 0
+          severity: HIGH,CRITICAL
+
+      - name: Scan frontend image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: zishann555/safechat-frontend:latest
+          format: table
+          exit-code: 0
+          severity: HIGH,CRITICAL
+
+      - name: Scan backend dependencies
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: backend-ml/
+          format: table
+          exit-code: 0
+          severity: HIGH,CRITICAL
+
   deploy:
     name: Deploy to EC2
     runs-on: ubuntu-latest
-    needs: build-and-push
+    needs: security-scan
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -50,7 +80,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose.yml,nginx/"
+          source: "nginx/"
           target: "/home/ubuntu/safechat"
 
       - name: Deploy via SSH
@@ -69,19 +99,32 @@ jobs:
 
             cat > docker-compose.yml << 'EOF'
             services:
-              backend:
+              backend1:
                 image: zishann555/safechat-backend:latest
-                container_name: safechat_backend
+                container_name: safechat_backend1
                 restart: unless-stopped
                 env_file:
                   - ./backend-ml/.env
-                environment:
-                  - PYTHONUNBUFFERED=1
                 volumes:
                   - uploads_data:/app/uploads
                   - model_data:/app/models
                 ports:
-                  - "8000:8000"
+                  - "8001:8000"
+                networks:
+                  - safechat_net
+                dns:
+                  - 8.8.8.8
+              backend2:
+                image: zishann555/safechat-backend:latest
+                container_name: safechat_backend2
+                restart: unless-stopped
+                env_file:
+                  - ./backend-ml/.env
+                volumes:
+                  - uploads_data:/app/uploads
+                  - model_data:/app/models
+                ports:
+                  - "8002:8000"
                 networks:
                   - safechat_net
                 dns:
@@ -94,20 +137,15 @@ jobs:
                   - "3000:80"
                 networks:
                   - safechat_net
-                depends_on:
-                  - backend
             volumes:
               uploads_data:
-                name: safechat_uploads
               model_data:
-                name: safechat_models
             networks:
               safechat_net:
-                name: safechat_network
                 driver: bridge
             EOF
 
             docker compose down || true
-            docker compose up -d
+            docker compose up -d --remove-orphans
             docker image prune -f
             echo "Deployment complete!"
