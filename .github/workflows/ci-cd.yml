@@ -65,7 +65,9 @@ jobs:
           format: table
           exit-code: 0
           severity: HIGH,CRITICAL
-          skip-dirs: ".env,.env.example"
+          scanners: vuln
+
+      
 
   deploy:
     name: Deploy to EC2
