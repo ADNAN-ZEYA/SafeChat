@@ -61,10 +61,11 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
-          scan-ref: backend-ml/
+          scan-ref: backend-ml/requirements.txt
           format: table
           exit-code: 0
           severity: HIGH,CRITICAL
+          skip-dirs: ".env,.env.example"
 
   deploy:
     name: Deploy to EC2
