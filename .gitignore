@@ -79,3 +79,4 @@ terraform/.terraform.lock.hcl
 # SSH Keys
 terraform/safechat-key
 terraform/safechat-key.pub
+kubernetes/secrets.yml
