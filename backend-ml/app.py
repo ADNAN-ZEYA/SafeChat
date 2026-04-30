@@ -104,16 +104,34 @@ Do not include anything else in your response."""
 
 def classify_text(text: str):
     """
-    Primary: Try OpenRouter LLM for better context-aware detection.
-    Fallback: Use local TF-IDF + Logistic Regression model.
-    If both fail: treat as clean.
+    1. Hindi/Hinglish keyword check
+    2. OpenRouter LLM
+    3. Local ML model fallback
     """
-    # Try OpenRouter first
+    # Step 1 - Hindi/Hinglish abusive word check
+    hindi_abusive = [
+        'randi', 'madarchod', 'bhenchod', 'chutiya', 'chutiye', 'mc', 'bc',
+        'bsdk', 'gaandu', 'gandu', 'harami', 'saala', 'saali', 'kamina',
+        'kutte', 'behenchod', 'maderchod', 'lodu', 'lund', 'bakchod',
+        'bhadwa', 'rande', 'rand', 'sala', 'bhosdike', 'bhosdika',
+        'madarchod', 'teri maa', 'teri behen', 'haramzada', 'haramzadi',
+        'chinal', 'chikna', 'chakka', 'hijra', 'kutiya', 'kamine',
+        'ullu', 'gadha', 'suwar', 'suar'
+    ]
+
+    text_lower = text.lower().strip()
+    words = text_lower.split()
+    for word in hindi_abusive:
+        if word in words or word in text_lower:
+            print(f"Hindi abusive word detected: {word}")
+            return "toxic", 0.95
+
+    # Step 2 - OpenRouter LLM
     label, prob = classify_text_with_openrouter(text)
     if label is not None:
         return label, prob
 
-    # Fallback to local ML model
+    # Step 3 - Local ML model fallback
     print("Falling back to local ML model...")
     ensure_model_loaded()
     try:
