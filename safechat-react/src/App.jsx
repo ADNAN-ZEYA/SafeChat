@@ -7,6 +7,9 @@ import ProfilePage from './ProfilePage';
 import FindFriendsPage from './FindFriendsPage';
 import AdminPanel from './AdminPanel';
 import AdminLogin from './AdminLogin';
+import Sidebar from './Sidebar';
+import ChatPanel from './ChatPanel';
+import NotificationsPanel from './NotificationsPanel';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -16,6 +19,8 @@ function App() {
   const [adminAuthenticated, setAdminAuthenticated] = useState(false);
   const [isAdminRoute, setIsAdminRoute] = useState(window.location.pathname === '/admin');
   const [notifications, setNotifications] = useState([]);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   const showNotification = useCallback((message, options = {}) => {
     const { type = 'warning', user = null } = options;
@@ -48,9 +53,7 @@ function App() {
     window.history.pushState({}, '', '/admin');
   };
 
-  const handleAdminLogin = (username) => {
-    setAdminAuthenticated(true);
-  };
+  const handleAdminLogin = () => setAdminAuthenticated(true);
   const handleAdminLogout = () => {
     setAdminAuthenticated(false);
     setIsAdminRoute(false);
@@ -69,7 +72,6 @@ function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Handle /admin route
   if (isAdminRoute) {
     if (!adminAuthenticated) {
       return (
@@ -110,6 +112,7 @@ function App() {
           setNotifications={setNotifications}
           chatTargetUser={chatTargetUser}
           onChatTargetConsumed={handleChatTargetConsumed}
+          onOpenChat={() => setIsChatOpen(true)}
         />
       );
     }
@@ -118,11 +121,11 @@ function App() {
         <ProfilePage
           user={currentUser}
           onLogout={handleLogout}
-          onNavigateToHome={navigateToHome}
+          onNavigateToHome={() => navigateToHome()}
           onNavigateToProfile={navigateToProfile}
           onNavigateToFriends={navigateToFriends}
-          onShowNotifications={() => { navigateToHome(); }}
-          onShowChat={() => { navigateToHome(); }}
+          onShowNotifications={() => setIsNotificationsOpen(true)}
+          onShowChat={() => setIsChatOpen(true)}
           showNotification={showNotification}
         />
       );
@@ -132,7 +135,7 @@ function App() {
         <FindFriendsPage
           user={currentUser}
           onLogout={handleLogout}
-          onNavigateToHome={navigateToHome}
+          onNavigateToHome={() => navigateToHome()}
           onNavigateToProfile={navigateToProfile}
           onNavigateToFriends={navigateToFriends}
           onStartChat={(username) => navigateToHome(username)}
@@ -140,14 +143,54 @@ function App() {
         />
       );
     }
-    // fallback
     return null;
   };
+
+  if (!currentUser) {
+    return (
+      <div>
+        {notification && <Notification message={notification} onClose={() => setNotification(null)} />}
+        <AuthPage onLogin={handleLogin} />
+      </div>
+    );
+  }
 
   return (
     <div>
       {notification && <Notification message={notification} onClose={() => setNotification(null)} />}
-      {currentUser ? renderPage() : <AuthPage onLogin={handleLogin} />}
+
+      {renderPage()}
+
+      {/* Mobile bottom nav */}
+      <div className="md:hidden">
+        <Sidebar
+          activePage={currentPage === 'home' ? 'Home' : currentPage === 'profile' ? 'Profile' : 'Find Friends'}
+          onShowNotifications={() => setIsNotificationsOpen(true)}
+          onShowChat={() => setIsChatOpen(true)}
+          onNavigateToHome={() => navigateToHome()}
+          onNavigateToProfile={navigateToProfile}
+          onNavigateToFriends={navigateToFriends}
+        />
+      </div>
+
+      {/* Notifications panel */}
+      {isNotificationsOpen && (
+        <NotificationsPanel
+          onClose={() => setIsNotificationsOpen(false)}
+          notifications={notifications}
+        />
+      )}
+
+      {/* Chat panel */}
+      {isChatOpen && (
+        <ChatPanel
+          onClose={() => setIsChatOpen(false)}
+          currentUser={currentUser}
+          showNotification={showNotification}
+          initialActiveUser={chatTargetUser}
+          refreshToken={0}
+        />
+      )}
     </div>
   );
 }

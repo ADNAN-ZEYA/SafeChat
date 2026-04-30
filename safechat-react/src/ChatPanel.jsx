@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   PhoneIcon, VideoCameraIcon, MagnifyingGlassIcon, PaperAirplaneIcon,
   XMarkIcon, ChatBubbleLeftEllipsisIcon, FlagIcon, FaceSmileIcon,
-  ArrowPathIcon,
+  ArrowPathIcon, ArrowLeftIcon,
 } from '@heroicons/react/24/outline';
 import { supabase, supabaseRealtimeEnabled } from './lib/supabaseClient';
 import usePresence from './hooks/usePresence';
@@ -304,11 +304,11 @@ export default function ChatPanel({ onClose, currentUser, showNotification, init
       )}
 
       {/* Main Chat Modal */}
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-sc-text/30 backdrop-blur-sm" onClick={onClose}>
-        <div className="flex h-[85vh] w-[92vw] max-w-6xl overflow-hidden rounded-card bg-sc-container-floor elevation-4 animate-scale-in" onClick={(e) => e.stopPropagation()}>
+      <div className="fixed inset-0 z-40 flex items-center justify-center md:bg-sc-text/30 md:backdrop-blur-sm" onClick={onClose}>
+        <div className="flex h-screen w-screen md:h-[85vh] md:w-[92vw] md:max-w-6xl overflow-hidden md:rounded-card bg-sc-container-floor elevation-4 animate-scale-in" onClick={(e) => e.stopPropagation()}>
 
           {/* LEFT: Users */}
-          <aside className="flex w-72 shrink-0 flex-col bg-sc-container-low border-r border-sc-outline/25">
+          <aside className={`flex shrink-0 flex-col bg-sc-container-low border-r border-sc-outline/25 ${activeUser ? "hidden md:flex md:w-72" : "flex w-full md:w-72"}`}>
             <div className="flex items-center justify-between px-5 py-5 border-b border-sc-outline/20">
               <h3 className="font-display text-base font-semibold tracking-tight text-sc-text">Chats</h3>
               <button onClick={onClose} className="rounded-full p-1.5 text-sc-text-muted transition hover:bg-sc-container-high hover:text-sc-text"><XMarkIcon className="h-5 w-5" /></button>
@@ -345,9 +345,13 @@ export default function ChatPanel({ onClose, currentUser, showNotification, init
           </aside>
 
           {/* RIGHT: Conversation */}
-          <section className="flex min-w-0 flex-1 flex-col bg-sc-container-floor">
+          <section className={`flex-1 min-w-0 flex-col bg-sc-container-floor ${activeUser ? "flex" : "hidden md:flex"}`}>
             <header className="flex items-center justify-between px-6 py-4 border-b border-sc-outline/20 bg-sc-container-low/40">
               <div className="flex items-center gap-3">
+                {/* Back button — mobile only */}
+                <button onClick={() => setActiveUser('')} className="md:hidden rounded-full p-1.5 text-sc-text-muted hover:bg-sc-container-high transition">
+                  <ArrowLeftIcon className="h-5 w-5" />
+                </button>
                 <div className="relative">
                   <img src={`https://i.pravatar.cc/150?u=${activeUser}`} alt={activeUser} className="h-9 w-9 rounded-full border border-sc-outline/20" />
                   <span className="absolute -bottom-0.5 -right-0.5">
@@ -420,7 +424,7 @@ export default function ChatPanel({ onClose, currentUser, showNotification, init
             </div>
 
             {/* Input */}
-            <form onSubmit={handleSendMessage} className="flex items-center gap-3 px-5 py-4 border-t border-sc-outline/20 bg-sc-container-low/30">
+            <form onSubmit={handleSendMessage} className="flex items-center gap-3 px-5 py-4 border-t border-sc-outline/20 bg-sc-container-low/30 mb-16 md:mb-0">
               <button type="button" className="rounded-full p-2 text-sc-text-muted border border-transparent hover:bg-sc-container-high hover:text-sc-primary hover:border-sc-outline/20 transition-all">
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
               </button>

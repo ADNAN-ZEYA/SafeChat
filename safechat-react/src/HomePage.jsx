@@ -27,7 +27,6 @@ const api = {
     deletePost: (id) => fetch(`${API_BASE_URL}/delete_post/${id}`, { method: 'POST' })
 };
 
-// Optimistic ID generator
 let _postTempCounter = 0;
 function genTempPostId() { return `_temppost_${Date.now()}_${++_postTempCounter}`; }
 
@@ -42,28 +41,25 @@ export default function HomePage({
   const [chatTarget, setChatTarget] = useState(null);
   const [chatRefreshToken, setChatRefreshToken] = useState(0);
   const [registeredUsers, setRegisteredUsers] = useState([]);
-  const [newPostText, setNewPostText] = useState("");
+  const [newPostText, setNewPostText] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
   const lastNotificationAtRef = useRef(new Date().toISOString());
   const seenMessageIdsRef = useRef(new Set());
   const [commentTexts, setCommentTexts] = useState({});
-
-  // --- Phase A: Presence ---
   const { onlineUsers } = usePresence(user);
 
   const fetchPosts = useCallback(async () => {
     try {
       const fetchedPosts = await api.getPosts();
       if (Array.isArray(fetchedPosts)) {
-        // --- Phase C: Anti-duplicate merge for optimistic posts ---
         setPosts(prev => {
           const serverIds = new Set(fetchedPosts.map(p => p.id));
           const pendingTemps = prev.filter(p => p._tempId && p._status === 'sending' && !serverIds.has(p._resolvedId));
           return [...pendingTemps, ...fetchedPosts];
         });
       }
-    } catch (error) { console.error("Failed to fetch posts:", error); setPosts([]); }
+    } catch (error) { console.error('Failed to fetch posts:', error); setPosts([]); }
   }, []);
 
   useEffect(() => {
@@ -107,44 +103,24 @@ export default function HomePage({
   };
   const handleImageSelect = (event) => { const file = event.target.files[0]; if (file) setSelectedImage(URL.createObjectURL(file)); };
 
-  // --- Phase C: Optimistic Post Creation ---
   const handleCreatePost = async () => {
     const text = newPostText.trim();
-    if (!text) { alert("Please add some text to your post."); return; }
-
+    if (!text) { alert('Please add some text to your post.'); return; }
     const tempId = genTempPostId();
-
-    // 1. Optimistic: push immediately
-    const optimisticPost = {
-      _tempId: tempId,
-      _status: 'sending',
-      id: tempId,
-      username: user,
-      text,
-      status: 'approved',
-      created_at: new Date().toISOString(),
-      comments: [],
-      likes: 0,
-    };
+    const optimisticPost = { _tempId: tempId, _status: 'sending', id: tempId, username: user, text, status: 'approved', created_at: new Date().toISOString(), comments: [], likes: 0 };
     setPosts(prev => [optimisticPost, ...prev]);
-    setNewPostText("");
-    setSelectedImage(null);
-
-    // 2. Fire API
+    setNewPostText(''); setSelectedImage(null);
     try {
       const response = await api.createPost(user, text);
       if (response.notification) showNotification(response.notification);
-      // 3. Replace optimistic with server data
       setPosts(prev => prev.filter(p => p._tempId !== tempId));
       fetchPosts();
     } catch {
-      // 4. Mark as failed
-      showNotification("Error: Could not create post.");
+      showNotification('Error: Could not create post.');
       setPosts(prev => prev.map(p => p._tempId === tempId ? { ...p, _status: 'failed' } : p));
     }
   };
 
-  // Retry a failed post
   const handleRetryPost = async (tempId) => {
     const failedPost = posts.find(p => p._tempId === tempId);
     if (!failedPost) return;
@@ -155,7 +131,7 @@ export default function HomePage({
       setPosts(prev => prev.filter(p => p._tempId !== tempId));
       fetchPosts();
     } catch {
-      showNotification("Retry failed.");
+      showNotification('Retry failed.');
       setPosts(prev => prev.map(p => p._tempId === tempId ? { ...p, _status: 'failed' } : p));
     }
   };
@@ -163,20 +139,23 @@ export default function HomePage({
   const handleAddComment = async (postId, commentText) => {
     if (!commentText || !commentText.trim()) return;
     try { const response = await api.createPost(user, commentText, postId); if (response.notification) showNotification(response.notification); setCommentTexts(prev => ({ ...prev, [postId]: '' })); fetchPosts(); }
-    catch { showNotification("Error: Could not post comment."); }
+    catch { showNotification('Error: Could not post comment.'); }
   };
-  const handleApprove = async (postId) => { await api.approvePost(postId); fetchPosts(); };
-  const handleBlock = async (postId) => { await api.blockPost(postId); fetchPosts(); };
-  const handleDelete = async (postId) => { try { await api.deletePost(postId); fetchPosts(); } catch { showNotification("Error: Could not delete post."); } };
+  const handleDelete = async (postId) => { try { await api.deletePost(postId); fetchPosts(); } catch { showNotification('Error: Could not delete post.'); } };
 
   return (
     <div className="relative min-h-screen text-sc-text bg-sc-surface">
-      <div className="mx-auto flex max-w-7xl">
-        {/* LEFT: Navigation */}
-        <aside className="sticky top-0 h-screen w-1/4">
-          <Sidebar onShowNotifications={() => setIsNotificationsOpen(true)} onShowChat={() => setIsChatOpen(true)}
-            onNavigateToHome={onNavigateToHome} onNavigateToProfile={onNavigateToProfile}
-            onNavigateToFriends={onNavigateToFriends} onNavigateToAdmin={onNavigateToAdmin} />
+      <div className="mx-auto flex max-w-7xl w-full">
+
+        {/* LEFT SIDEBAR — desktop only */}
+        <aside className="hidden md:block sticky top-0 h-screen w-1/4 shrink-0">
+          <Sidebar
+            onShowNotifications={() => setIsNotificationsOpen(true)}
+            onShowChat={() => setIsChatOpen(true)}
+            onNavigateToHome={onNavigateToHome}
+            onNavigateToProfile={onNavigateToProfile}
+            onNavigateToFriends={onNavigateToFriends}
+          />
           <div className="absolute bottom-4 p-4">
             <button onClick={onLogout} className="flex items-center gap-4 rounded-full p-3 text-base text-sc-text-muted transition-all hover:bg-sc-container-high hover:text-sc-primary">
               <span>Logout <strong className="text-sc-text">{user}</strong></span>
@@ -184,20 +163,21 @@ export default function HomePage({
           </div>
         </aside>
 
-        {/* MIDDLE: Feed */}
-        <main className="w-1/2 min-h-screen bg-sc-container-low border-x border-sc-outline/20">
-          <div className="p-8">
+        {/* MAIN FEED */}
+        <main className="flex-1 min-w-0 min-h-screen bg-sc-container-low md:border-x border-sc-outline/20 pb-24 md:pb-0">
+          <div className="p-4 md:p-8">
+
             {/* Welcome */}
-            <div className="mb-8 rounded-card bg-sc-container p-8 elevation-1 animate-fade-in-up">
-              <h2 className="font-display text-3xl font-bold text-sc-text">Welcome, {user}</h2>
-              <p className="text-sc-text-muted mt-2">Share updates, reply to comments, and stay connected in real time.</p>
+            <div className="mb-6 rounded-card bg-sc-container p-5 md:p-8 elevation-1 animate-fade-in-up">
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-sc-text">Welcome, {user}</h2>
+              <p className="text-sc-text-muted mt-1 text-sm">Share updates, reply to comments, and stay connected in real time.</p>
             </div>
 
             {/* Create Post */}
-            <section className="mb-10 rounded-card bg-sc-container p-8 elevation-2 animate-fade-in-up stagger-1">
+            <section className="mb-8 rounded-card bg-sc-container p-5 md:p-8 elevation-2 animate-fade-in-up stagger-1">
               <textarea value={newPostText} onChange={(e) => setNewPostText(e.target.value)}
                 placeholder={`What's on your mind, ${user}?`}
-                className="w-full resize-none bg-transparent p-3 text-lg text-sc-text placeholder-sc-text-muted/50 focus:outline-none" />
+                className="w-full resize-none bg-transparent p-2 text-base md:text-lg text-sc-text placeholder-sc-text-muted/50 focus:outline-none" />
               {selectedImage && (
                 <div className="mt-4 relative">
                   <img src={selectedImage} alt="Preview" className="w-full rounded-card border border-sc-outline/20" />
@@ -213,7 +193,7 @@ export default function HomePage({
                   <ImageIcon />
                 </button>
                 <button onClick={handleCreatePost}
-                  className="rounded-full bg-gradient-primary px-7 py-2.5 font-bold text-sc-on-primary hover-scale border border-sc-primary/20 transition-all duration-200">
+                  className="rounded-full bg-gradient-primary px-6 py-2.5 font-bold text-sc-on-primary hover-scale border border-sc-primary/20 transition-all duration-200">
                   Post
                 </button>
               </div>
@@ -221,11 +201,10 @@ export default function HomePage({
 
             {/* Feed */}
             <section>
-              <h2 className="mb-6 font-display text-xl font-semibold text-sc-text">Feed</h2>
-              <div className="space-y-6">
+              <h2 className="mb-4 font-display text-xl font-semibold text-sc-text">Feed</h2>
+              <div className="space-y-4">
                 {Array.isArray(posts) && posts.filter(post => {
                   if (post.status === 'blocked') return false;
-                  // Hide other users' pending posts — only show your own so you know it's under review
                   if (post.status === 'pending' && post.username !== user) return false;
                   return true;
                 }).map((post, idx) => {
@@ -233,15 +212,10 @@ export default function HomePage({
                   const isFailed = post._status === 'failed';
                   return (
                     <div key={post._tempId || post.id}
-                      className={[
-                        'rounded-card overflow-hidden hover-lift animate-fade-in-up',
-                        post.status === 'pending' ? 'bg-sc-tertiary/10 border border-sc-tertiary/30' : 'bg-sc-container elevation-1',
-                        isSending ? 'opacity-70' : '',
-                        isFailed ? 'border border-red-400/30' : '',
-                      ].filter(Boolean).join(' ')}
+                      className={['rounded-card overflow-hidden hover-lift animate-fade-in-up', post.status === 'pending' ? 'bg-sc-tertiary/10 border border-sc-tertiary/30' : 'bg-sc-container elevation-1', isSending ? 'opacity-70' : '', isFailed ? 'border border-red-400/30' : ''].filter(Boolean).join(' ')}
                       style={{ animationDelay: `${idx * 60}ms` }}>
-                      <div className="p-7">
-                        <div className="mb-4 flex justify-between text-sm text-sc-text-muted">
+                      <div className="p-4 md:p-7">
+                        <div className="mb-3 flex justify-between text-sm text-sc-text-muted">
                           <span className="font-bold text-sc-primary capitalize">{post.username}</span>
                           <div className="flex items-center gap-2">
                             {isSending && <span className="text-xs italic text-sc-text-muted">Posting...</span>}
@@ -253,21 +227,21 @@ export default function HomePage({
                             {!isSending && !isFailed && <span>{new Date(post.created_at).toLocaleString()}</span>}
                           </div>
                         </div>
-                        <p className="mb-4 text-sc-text leading-relaxed">{post.text}</p>
+                        <p className="mb-3 text-sc-text leading-relaxed">{post.text}</p>
 
                         {post.status === 'pending' && (
-                          <div className="flex items-center gap-3 rounded-2xl bg-sc-tertiary/20 border border-sc-tertiary/30 p-4 mt-4">
+                          <div className="flex items-center gap-3 rounded-2xl bg-sc-tertiary/20 border border-sc-tertiary/30 p-3 mt-3">
                             <svg className="h-5 w-5 text-sc-on-tertiary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
                             <div>
                               <p className="text-sm font-semibold text-sc-on-tertiary">Under review</p>
-                              <p className="text-xs text-sc-text-muted mt-0.5">This post is being reviewed by an admin for policy compliance.</p>
+                              <p className="text-xs text-sc-text-muted mt-0.5">Being reviewed by an admin.</p>
                             </div>
                           </div>
                         )}
 
                         {!post._tempId && (
                           <>
-                            <div className="flex gap-6 pt-5 mt-5 border-t border-sc-outline/15 text-sc-text-muted">
+                            <div className="flex gap-4 pt-4 mt-4 border-t border-sc-outline/15 text-sc-text-muted">
                               <button onClick={() => handleLike(post.id, post.username)} className="flex items-center gap-2 transition-all hover:text-sc-primary-light hover:scale-110">
                                 <HeartIcon /> {post.likes || 0}
                               </button>
@@ -281,10 +255,9 @@ export default function HomePage({
                               )}
                             </div>
 
-                            {/* Comments */}
-                            <div className="space-y-3 pt-5 mt-3">
+                            <div className="space-y-2 pt-3 mt-2">
                               {Array.isArray(post.comments) && post.comments.filter(c => c.status !== 'blocked').map((comment) => (
-                                <div key={comment.id} className="text-sm pl-4 border-l-2 border-sc-primary/20">
+                                <div key={comment.id} className="text-sm pl-3 border-l-2 border-sc-primary/20">
                                   <div className="flex justify-between items-center">
                                     <div>
                                       <span className="mr-2 font-semibold capitalize text-sc-primary">{comment.username}</span>
@@ -298,14 +271,13 @@ export default function HomePage({
                               ))}
                             </div>
 
-                            {/* Comment Form */}
                             <form onSubmit={(e) => { e.preventDefault(); handleAddComment(post.id, commentTexts[post.id] || ''); }}
-                              className="flex items-center gap-3 pt-5 mt-3">
+                              className="flex items-center gap-2 pt-3 mt-2">
                               <input type="text" placeholder="Add a comment..."
                                 value={commentTexts[post.id] || ''}
                                 onChange={(e) => setCommentTexts(prev => ({ ...prev, [post.id]: e.target.value }))}
-                                className="w-full rounded-full bg-sc-container-high px-5 py-2.5 text-sm text-sc-text placeholder-sc-text-muted/50 border border-sc-outline/25 focus:outline-none focus:bg-sc-container-floor focus:border-sc-primary/40 focus:shadow-glow-coral transition-all duration-200" />
-                              <button type="submit" className="rounded-full bg-gradient-primary px-5 py-2.5 text-sm font-semibold text-sc-on-primary hover-scale border border-sc-primary/20 transition-all">Post</button>
+                                className="w-full rounded-full bg-sc-container-high px-4 py-2 text-sm text-sc-text placeholder-sc-text-muted/50 border border-sc-outline/25 focus:outline-none focus:bg-sc-container-floor focus:border-sc-primary/40 transition-all duration-200" />
+                              <button type="submit" className="rounded-full bg-gradient-primary px-4 py-2 text-sm font-semibold text-sc-on-primary hover-scale border border-sc-primary/20 transition-all">Post</button>
                             </form>
                           </>
                         )}
@@ -318,8 +290,8 @@ export default function HomePage({
           </div>
         </main>
 
-        {/* RIGHT: Widgets */}
-        <aside className="sticky top-0 h-screen w-1/4 p-6 bg-sc-surface">
+        {/* RIGHT SIDEBAR — desktop only */}
+        <aside className="hidden md:block sticky top-0 h-screen w-1/4 p-6 bg-sc-surface">
           <div className="rounded-card bg-sc-container-low elevation-1 p-5 animate-fade-in-up stagger-2">
             <h3 className="mb-5 font-display text-lg font-bold text-sc-text">Registered Users</h3>
             <div className="space-y-4 max-h-[420px] overflow-y-auto pr-1">
